@@ -5,12 +5,15 @@ import 'package:animehome/presentation/home/hybrid_anime_provider.dart';
 import 'package:animehome/domain/entities/anime/anime_list_entity.dart';
 import 'package:animehome/presentation/home/widgets/anime_card.dart';
 import 'package:animehome/presentation/detail/anime_detail_page.dart';
+import 'package:animehome/l10n/app_localizations.dart';
 
 class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
         return Scaffold(
@@ -28,7 +31,7 @@ class CategoriesScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Categories',
+                              localizations.categories,
                               style: TextStyle(
                                 color: themeProvider.primaryTextColor,
                                 fontSize: 28,
@@ -37,7 +40,7 @@ class CategoriesScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Explore anime by genre',
+                              localizations.exploreByGenre,
                               style: TextStyle(
                                 color: themeProvider.secondaryTextColor,
                                 fontSize: 16,
@@ -61,9 +64,11 @@ class CategoriesScreen extends StatelessWidget {
                           crossAxisSpacing: 16,
                           mainAxisSpacing: 16,
                         ),
-                    itemCount: _categories.length,
+                    itemCount: _getLocalizedCategories(localizations).length,
                     itemBuilder: (context, index) {
-                      final category = _categories[index];
+                      final category = _getLocalizedCategories(
+                        localizations,
+                      )[index];
                       return _buildCategoryCard(context, category);
                     },
                   ),
@@ -76,6 +81,107 @@ class CategoriesScreen extends StatelessWidget {
     );
   }
 
+  List<CategoryModel> _getLocalizedCategories(AppLocalizations localizations) {
+    return [
+      CategoryModel(
+        name: localizations.actionCategory,
+        englishName: 'Action',
+        color: Colors.red,
+        icon: Icons.flash_on,
+      ),
+      CategoryModel(
+        name: localizations.adventureCategory,
+        englishName: 'Adventure',
+        color: Colors.orange,
+        icon: Icons.explore,
+      ),
+      CategoryModel(
+        name: localizations.comedyCategory,
+        englishName: 'Comedy',
+        color: Colors.yellow,
+        icon: Icons.sentiment_very_satisfied,
+      ),
+      CategoryModel(
+        name: localizations.dramaCategory,
+        englishName: 'Drama',
+        color: Colors.purple,
+        icon: Icons.theater_comedy,
+      ),
+      CategoryModel(
+        name: localizations.fantasyCategory,
+        englishName: 'Fantasy',
+        color: Colors.pink,
+        icon: Icons.auto_awesome,
+      ),
+      CategoryModel(
+        name: localizations.horrorCategory,
+        englishName: 'Horror',
+        color: Colors.grey[800]!,
+        icon: Icons.nightlight,
+      ),
+      CategoryModel(
+        name: localizations.romanceCategory,
+        englishName: 'Romance',
+        color: Colors.pink[300]!,
+        icon: Icons.favorite,
+      ),
+      CategoryModel(
+        name: localizations.sciFiCategory,
+        englishName: 'Sci-Fi',
+        color: Colors.cyan,
+        icon: Icons.rocket_launch,
+      ),
+      CategoryModel(
+        name: localizations.thrillerCategory,
+        englishName: 'Thriller',
+        color: Colors.indigo,
+        icon: Icons.psychology,
+      ),
+      CategoryModel(
+        name: localizations.supernaturalCategory,
+        englishName: 'Supernatural',
+        color: Colors.deepPurple,
+        icon: Icons.auto_fix_high,
+      ),
+      CategoryModel(
+        name: localizations.mysteryCategory,
+        englishName: 'Mystery',
+        color: Colors.brown,
+        icon: Icons.search,
+      ),
+      CategoryModel(
+        name: localizations.sportsCategory,
+        englishName: 'Sports',
+        color: Colors.green,
+        icon: Icons.sports_soccer,
+      ),
+      CategoryModel(
+        name: localizations.sliceOfLifeCategory,
+        englishName: 'Slice of Life',
+        color: Colors.lightBlue,
+        icon: Icons.home,
+      ),
+      CategoryModel(
+        name: localizations.historicalCategory,
+        englishName: 'Historical',
+        color: Colors.amber[700]!,
+        icon: Icons.history_edu,
+      ),
+      CategoryModel(
+        name: localizations.psychologicalCategory,
+        englishName: 'Psychological',
+        color: Colors.teal,
+        icon: Icons.psychology_alt,
+      ),
+      CategoryModel(
+        name: localizations.shounenCategory,
+        englishName: 'Shounen',
+        color: Colors.blue,
+        icon: Icons.group,
+      ),
+    ];
+  }
+
   Widget _buildCategoryCard(BuildContext context, CategoryModel category) {
     return GestureDetector(
       onTap: () {
@@ -83,13 +189,14 @@ class CategoriesScreen extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => CategoryAnimeScreen(
-              categoryName: category.name,
+              categoryName: category.englishName, // API uchun inglizcha nom
+              displayName: category.name, // Ko'rsatish uchun localized nom
               categoryColor: category.color,
               categoryIcon: category.icon,
             ),
           ),
         );
-      },
+      }, 
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -135,71 +242,28 @@ class CategoriesScreen extends StatelessWidget {
 
 class CategoryModel {
   final String name;
+  final String englishName; // API uchun inglizcha nom
   final Color color;
   final IconData icon;
 
-  CategoryModel({required this.name, required this.color, required this.icon});
+  CategoryModel({
+    required this.name,
+    required this.englishName,
+    required this.color,
+    required this.icon,
+  });
 }
 
-final List<CategoryModel> _categories = [
-  CategoryModel(name: 'Action', color: Colors.red, icon: Icons.flash_on),
-  CategoryModel(name: 'Adventure', color: Colors.orange, icon: Icons.explore),
-  CategoryModel(
-    name: 'Comedy',
-    color: Colors.yellow,
-    icon: Icons.sentiment_very_satisfied,
-  ),
-  CategoryModel(
-    name: 'Drama',
-    color: Colors.purple,
-    icon: Icons.theater_comedy,
-  ),
-  CategoryModel(name: 'Fantasy', color: Colors.pink, icon: Icons.auto_awesome),
-  CategoryModel(
-    name: 'Horror',
-    color: Colors.grey[800]!,
-    icon: Icons.nightlight,
-  ),
-  CategoryModel(
-    name: 'Romance',
-    color: Colors.pink[300]!,
-    icon: Icons.favorite,
-  ),
-  CategoryModel(name: 'Sci-Fi', color: Colors.cyan, icon: Icons.rocket_launch),
-  CategoryModel(name: 'Thriller', color: Colors.indigo, icon: Icons.psychology),
-  CategoryModel(
-    name: 'Supernatural',
-    color: Colors.deepPurple,
-    icon: Icons.auto_fix_high,
-  ),
-  CategoryModel(name: 'Mystery', color: Colors.brown, icon: Icons.search),
-  CategoryModel(name: 'Sports', color: Colors.green, icon: Icons.sports_soccer),
-  CategoryModel(
-    name: 'Slice of Life',
-    color: Colors.lightBlue,
-    icon: Icons.home,
-  ),
-  CategoryModel(
-    name: 'Historical',
-    color: Colors.amber[700]!,
-    icon: Icons.history_edu,
-  ),
-  CategoryModel(
-    name: 'Psychological',
-    color: Colors.teal,
-    icon: Icons.psychology_alt,
-  ),
-  CategoryModel(name: 'Shounen', color: Colors.blue, icon: Icons.group),
-];
-
 class CategoryAnimeScreen extends StatefulWidget {
-  final String categoryName;
+  final String categoryName; // API uchun inglizcha nom
+  final String displayName; // Ko'rsatish uchun localized nom
   final Color categoryColor;
   final IconData categoryIcon;
 
   const CategoryAnimeScreen({
     super.key,
     required this.categoryName,
+    required this.displayName,
     required this.categoryColor,
     required this.categoryIcon,
   });
@@ -244,6 +308,8 @@ class _CategoryAnimeScreenState extends State<CategoryAnimeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
         return Scaffold(
@@ -280,7 +346,7 @@ class _CategoryAnimeScreenState extends State<CategoryAnimeScreen> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            widget.categoryName,
+                            widget.displayName, // Localized nom ko'rsatamiz
                             style: TextStyle(
                               color: themeProvider.primaryTextColor,
                               fontSize: 24,
@@ -305,7 +371,7 @@ class _CategoryAnimeScreenState extends State<CategoryAnimeScreen> {
                   ),
 
                   // Content
-                  Expanded(child: _buildContent(themeProvider)),
+                  Expanded(child: _buildContent(themeProvider, localizations)),
                 ],
               ),
             ),
@@ -315,7 +381,10 @@ class _CategoryAnimeScreenState extends State<CategoryAnimeScreen> {
     );
   }
 
-  Widget _buildContent(ThemeProvider themeProvider) {
+  Widget _buildContent(
+    ThemeProvider themeProvider,
+    AppLocalizations localizations,
+  ) {
     if (_isLoading) {
       return const Center(
         child: CircularProgressIndicator(color: Color(0xFF00D4AA)),
@@ -334,7 +403,7 @@ class _CategoryAnimeScreenState extends State<CategoryAnimeScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Error loading anime',
+              localizations.errorLoadingAnime,
               style: TextStyle(
                 color: themeProvider.primaryTextColor,
                 fontSize: 18,
@@ -357,7 +426,7 @@ class _CategoryAnimeScreenState extends State<CategoryAnimeScreen> {
                 backgroundColor: widget.categoryColor,
                 foregroundColor: Colors.white,
               ),
-              child: const Text('Retry'),
+              child: Text(localizations.retry),
             ),
           ],
         ),
@@ -376,7 +445,7 @@ class _CategoryAnimeScreenState extends State<CategoryAnimeScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'No ${widget.categoryName} anime found',
+              '${widget.displayName} ${localizations.noAnimeFound}',
               style: TextStyle(
                 color: themeProvider.primaryTextColor,
                 fontSize: 18,
@@ -385,7 +454,7 @@ class _CategoryAnimeScreenState extends State<CategoryAnimeScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Try checking other categories',
+              localizations.tryCheckingOtherCategories,
               style: TextStyle(
                 color: themeProvider.secondaryTextColor,
                 fontSize: 14,
@@ -404,7 +473,7 @@ class _CategoryAnimeScreenState extends State<CategoryAnimeScreen> {
           child: Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              '${_animeList.length} anime available',
+              '${_animeList.length} ${localizations.animeAvailable}',
               style: TextStyle(
                 color: themeProvider.secondaryTextColor,
                 fontSize: 14,
@@ -414,7 +483,9 @@ class _CategoryAnimeScreenState extends State<CategoryAnimeScreen> {
         ),
         const SizedBox(height: 20),
         // Anime List/Grid
-        Expanded(child: _isGridView ? _buildGridView() : _buildListView()),
+        Expanded(
+          child: _isGridView ? _buildGridView() : _buildListView(localizations),
+        ),
       ],
     );
   }
@@ -435,7 +506,7 @@ class _CategoryAnimeScreenState extends State<CategoryAnimeScreen> {
     );
   }
 
-  Widget _buildListView() {
+  Widget _buildListView(AppLocalizations localizations) {
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       itemCount: _animeList.length,
@@ -501,7 +572,7 @@ class _CategoryAnimeScreenState extends State<CategoryAnimeScreen> {
                     ),
                     const SizedBox(width: 16),
                     Text(
-                      '${anime.episodes} Episodes',
+                      '${anime.episodes} ${localizations.episodes}',
                       style: const TextStyle(
                         color: Colors.white54,
                         fontSize: 12,

@@ -3,14 +3,17 @@ import 'package:provider/provider.dart';
 import 'package:animehome/presentation/theme/theme_provider.dart';
 import 'package:animehome/presentation/likes/likes_provider.dart';
 import 'package:animehome/presentation/home/widgets/anime_card.dart';
+import 'package:animehome/l10n/app_localizations.dart';
 
 class LikesScreen extends StatelessWidget {
   const LikesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) {
+    final localizations = AppLocalizations.of(context)!;
+
+    return Consumer2<ThemeProvider, LikesProvider>(
+      builder: (context, themeProvider, likesProvider, child) {
         return Scaffold(
           backgroundColor: themeProvider.backgroundColor,
           body: SafeArea(
@@ -26,7 +29,7 @@ class LikesScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'My List',
+                              localizations.myListTitle,
                               style: TextStyle(
                                 color: themeProvider.primaryTextColor,
                                 fontSize: 28,
@@ -35,7 +38,7 @@ class LikesScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Your favorite anime collection',
+                              localizations.favoriteCollection,
                               style: TextStyle(
                                 color: themeProvider.secondaryTextColor,
                                 fontSize: 16,
@@ -54,7 +57,11 @@ class LikesScreen extends StatelessWidget {
                             onPressed: likesProvider.favoriteAnimes.isEmpty
                                 ? null
                                 : () {
-                                    _showClearAllDialog(context, likesProvider);
+                                    _showClearAllDialog(
+                                      context,
+                                      likesProvider,
+                                      localizations,
+                                    );
                                   },
                           );
                         },
@@ -67,7 +74,7 @@ class LikesScreen extends StatelessWidget {
                   child: Consumer<LikesProvider>(
                     builder: (context, likesProvider, child) {
                       return likesProvider.favoriteAnimes.isEmpty
-                          ? _buildEmptyState()
+                          ? _buildEmptyState(localizations)
                           : Column(
                               children: [
                                 // Favorites info
@@ -82,7 +89,7 @@ class LikesScreen extends StatelessWidget {
                                       ),
                                       const SizedBox(width: 8),
                                       Text(
-                                        'Sevimli anime\'laringiz',
+                                        localizations.favoriteAnimes,
                                         style: TextStyle(
                                           color: Colors.grey[400],
                                           fontSize: 16,
@@ -104,7 +111,7 @@ class LikesScreen extends StatelessWidget {
                                           ),
                                         ),
                                         child: Text(
-                                          '${likesProvider.favoriteAnimes.length} ta',
+                                          '${likesProvider.favoriteAnimes.length} ${localizations.count}',
                                           style: const TextStyle(
                                             color: Colors.orange,
                                             fontSize: 14,
@@ -131,7 +138,7 @@ class LikesScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(AppLocalizations localizations) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -139,7 +146,7 @@ class LikesScreen extends StatelessWidget {
           Icon(Icons.favorite_border, size: 80, color: Colors.grey[400]),
           const SizedBox(height: 20),
           Text(
-            'Sevimli anime\'laringiz yo\'q',
+            localizations.noFavoriteAnimesYet,
             style: TextStyle(
               color: Colors.grey[400],
               fontSize: 18,
@@ -148,7 +155,7 @@ class LikesScreen extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Anime\'larni sevimli qilish uchun ❤️ tugmasini bosing',
+            localizations.tapHeartToFavorite,
             style: TextStyle(color: Colors.grey[600], fontSize: 14),
             textAlign: TextAlign.center,
           ),
@@ -158,7 +165,7 @@ class LikesScreen extends StatelessWidget {
               // Home sahifasiga o'tish
             },
             icon: const Icon(Icons.explore),
-            label: const Text('Anime\'larni ko\'rish'),
+            label: Text(localizations.viewAnimes),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.orange,
               foregroundColor: Colors.white,
@@ -186,32 +193,36 @@ class LikesScreen extends StatelessWidget {
     );
   }
 
-  void _showClearAllDialog(BuildContext context, LikesProvider likesProvider) {
+  void _showClearAllDialog(
+    BuildContext context,
+    LikesProvider likesProvider,
+    AppLocalizations localizations,
+  ) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF2A2A2A),
-        title: const Text(
-          'Barcha sevimlilarni o\'chirish',
-          style: TextStyle(color: Colors.white),
+        title: Text(
+          localizations.deleteAllFavorites,
+          style: const TextStyle(color: Colors.white),
         ),
-        content: const Text(
-          'Haqiqatan ham barcha sevimli anime\'larni o\'chirmoqchimisiz?',
-          style: TextStyle(color: Colors.grey),
+        content: Text(
+          localizations.confirmDeleteAllFavorites,
+          style: const TextStyle(color: Colors.grey),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Bekor qilish'),
+            child: Text(localizations.cancel),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               likesProvider.clearAllFavorites();
             },
-            child: const Text(
-              'O\'chirish',
-              style: TextStyle(color: Colors.red),
+            child: Text(
+              localizations.delete,
+              style: const TextStyle(color: Colors.red),
             ),
           ),
         ],

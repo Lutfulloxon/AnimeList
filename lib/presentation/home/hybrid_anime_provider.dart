@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:animehome/domain/entities/anime/anime_list_entity.dart';
 import 'package:animehome/data/services/anime_api_service.dart';
 import 'package:animehome/data/services/smart_cache_service.dart';
-import 'package:animehome/data/repositories/anime_repository_impl.dart';
-
 class HybridAnimeProvider extends ChangeNotifier {
   List<AnimeEntity> _animeList = [];
   List<AnimeEntity> _searchResults = [];

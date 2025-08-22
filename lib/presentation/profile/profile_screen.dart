@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:animehome/presentation/theme/theme_provider.dart';
 import 'package:animehome/presentation/profile/profile_edit_screen.dart';
 import 'package:animehome/presentation/settings/settings_provider.dart';
+import 'package:animehome/l10n/app_localizations.dart';
+import 'package:animehome/data/services/hive_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -12,10 +14,36 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  String _userName = '';
+  String _userEmail = '';
+  String _userBio = '';
+  String _userAvatar = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  void _loadUserData() {
+    setState(() {
+      _userName =
+          HiveService.getSetting<String>('user_name', defaultValue: '') ?? '';
+      _userEmail =
+          HiveService.getSetting<String>('user_email', defaultValue: '') ?? '';
+      _userBio =
+          HiveService.getSetting<String>('user_bio', defaultValue: '') ?? '';
+      _userAvatar =
+          HiveService.getSetting<String>('user_avatar', defaultValue: '') ?? '';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) {
+    final localizations = AppLocalizations.of(context)!;
+
+    return Consumer2<ThemeProvider, SettingsProvider>(
+      builder: (context, themeProvider, settingsProvider, child) {
         return Scaffold(
           backgroundColor: themeProvider.backgroundColor,
           body: SafeArea(
@@ -42,7 +70,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       const SizedBox(width: 12),
                       Text(
-                        'Profile',
+                        localizations.profile,
                         style: TextStyle(
                           color: themeProvider.primaryTextColor,
                           fontSize: 24,
@@ -98,7 +126,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Ajay Kevin',
+                          _userName.isEmpty
+                              ? localizations.defaultUserName
+                              : _userName,
                           style: TextStyle(
                             color: themeProvider.primaryTextColor,
                             fontSize: 24,
@@ -107,7 +137,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Ajay14587@gmail.com',
+                          _userEmail.isEmpty
+                              ? localizations.defaultUserEmail
+                              : _userEmail,
                           style: TextStyle(
                             color: themeProvider.secondaryTextColor,
                             fontSize: 16,
@@ -130,7 +162,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Average consumption',
+                          localizations.averageConsumption,
                           style: TextStyle(
                             color: themeProvider.primaryTextColor,
                             fontSize: 18,
@@ -158,7 +190,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  '15 Hours / month',
+                                  '15 ${localizations.hoursPerMonth}',
                                   style: TextStyle(
                                     color: themeProvider.primaryTextColor,
                                     fontSize: 16,
@@ -166,7 +198,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 ),
                                 Text(
-                                  '1 active subscription',
+                                  '1 ${localizations.activeSubscription}',
                                   style: TextStyle(
                                     color: themeProvider.secondaryTextColor,
                                     fontSize: 14,
@@ -209,21 +241,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                         const SizedBox(width: 16),
-                        const Expanded(
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Free Download',
-                                style: TextStyle(
+                                localizations.freeDownload,
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               Text(
-                                'More than 1 million Manga\non your Finger tip',
-                                style: TextStyle(
+                                localizations.mangaDescription,
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 12,
                                 ),
@@ -250,14 +282,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     context,
                     themeProvider,
                     Icons.person_outline_rounded,
-                    'Edit Profile',
-                    () {
-                      Navigator.push(
+                    localizations.editProfile,
+                    () async {
+                      final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => const ProfileEditScreen(),
                         ),
                       );
+
+                      // Agar profil yangilangan bo'lsa, ma'lumotlarni qayta yuklash
+                      if (result == true) {
+                        _loadUserData();
+                      }
                     },
                   ),
 
@@ -267,13 +304,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         context,
                         themeProvider,
                         Icons.language_outlined,
-                        'Language',
+                        localizations.language,
                         () {
                           _showLanguageDialog(context, settingsProvider);
                         },
                         trailing: settingsProvider.language == 'uz'
-                            ? 'O\'zbek'
-                            : 'English',
+                            ? localizations.uzbek
+                            : localizations.english,
                       );
                     },
                   ),
@@ -281,7 +318,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     context,
                     themeProvider,
                     Icons.dark_mode_outlined,
-                    'Dark Mode',
+                    localizations.darkMode,
                     () {
                       themeProvider.toggleTheme();
                     },

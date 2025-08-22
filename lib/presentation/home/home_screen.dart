@@ -32,18 +32,18 @@ class HomeScreen extends StatelessWidget {
               child: Consumer<HybridAnimeProvider>(
                 builder: (context, provider, child) {
                   if (provider.isLoading) {
-                    return const Center(
+                    return Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          CircularProgressIndicator(
+                          const CircularProgressIndicator(
                             color: Color(0xFF00D4AA),
                             strokeWidth: 3,
                           ),
-                          SizedBox(height: 16),
+                          const SizedBox(height: 16),
                           Text(
-                            'Loading amazing anime...',
-                            style: TextStyle(
+                            localizations.loadingAmazingAnime,
+                            style: const TextStyle(
                               color: Colors.white70,
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
@@ -55,10 +55,13 @@ class HomeScreen extends StatelessWidget {
                   }
 
                   if (provider.animeList.isEmpty) {
-                    return const Center(
+                    return Center(
                       child: Text(
-                        'No anime found',
-                        style: TextStyle(color: Colors.white70, fontSize: 18),
+                        localizations.noAnimeFoundGeneral,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 18,
+                        ),
                       ),
                     );
                   }
@@ -176,7 +179,7 @@ class HomeScreen extends StatelessWidget {
                       // For You Section
                       SliverToBoxAdapter(
                         child: _buildSectionHeader(
-                          'For You',
+                          localizations.forYou,
                           localizations.seeAll,
                           () {
                             Navigator.push(
@@ -338,7 +341,7 @@ class HomeScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Anime • ${anime.year}',
+                          '${localizations.anime} • ${anime.year}',
                           style: TextStyle(
                             color: Colors.white.withValues(alpha: 0.8),
                             fontSize: 14,
@@ -391,7 +394,8 @@ class HomeScreen extends StatelessWidget {
                                         SnackBar(
                                           content: Text(
                                             isFavorite
-                                                ? 'Sevimlilardan olib tashlandi'
+                                                ? localizations
+                                                      .removedFromFavoritesMessage
                                                 : localizations.addedToMyList,
                                           ),
                                           backgroundColor: isFavorite

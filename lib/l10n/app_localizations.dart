@@ -56,6 +56,46 @@ class AppLocalizations {
   String get tryOtherCategories => locale.languageCode == 'uz'
       ? 'Boshqa kategoriyalarni sinab ko\'ring'
       : 'Try other categories';
+  String get animeAvailable =>
+      locale.languageCode == 'uz' ? 'anime mavjud' : 'anime available';
+  String get errorLoadingAnime => locale.languageCode == 'uz'
+      ? 'Anime yuklashda xatolik'
+      : 'Error loading anime';
+  String get noAnimeFound =>
+      locale.languageCode == 'uz' ? 'anime topilmadi' : 'anime found';
+  String get tryCheckingOtherCategories => locale.languageCode == 'uz'
+      ? 'Boshqa kategoriyalarni tekshirib ko\'ring'
+      : 'Try checking other categories';
+
+  // Category Names
+  String get actionCategory => locale.languageCode == 'uz' ? 'Jang' : 'Action';
+  String get adventureCategory =>
+      locale.languageCode == 'uz' ? 'Sarguzasht' : 'Adventure';
+  String get comedyCategory =>
+      locale.languageCode == 'uz' ? 'Komediya' : 'Comedy';
+  String get dramaCategory => locale.languageCode == 'uz' ? 'Drama' : 'Drama';
+  String get fantasyCategory =>
+      locale.languageCode == 'uz' ? 'Fantastika' : 'Fantasy';
+  String get horrorCategory =>
+      locale.languageCode == 'uz' ? 'Qo\'rqinchli' : 'Horror';
+  String get romanceCategory =>
+      locale.languageCode == 'uz' ? 'Romantika' : 'Romance';
+  String get sciFiCategory =>
+      locale.languageCode == 'uz' ? 'Ilmiy-fantastik' : 'Sci-Fi';
+  String get thrillerCategory =>
+      locale.languageCode == 'uz' ? 'Triller' : 'Thriller';
+  String get supernaturalCategory =>
+      locale.languageCode == 'uz' ? 'G\'ayritabiiy' : 'Supernatural';
+  String get mysteryCategory => locale.languageCode == 'uz' ? 'Sir' : 'Mystery';
+  String get sportsCategory => locale.languageCode == 'uz' ? 'Sport' : 'Sports';
+  String get sliceOfLifeCategory =>
+      locale.languageCode == 'uz' ? 'Hayot lavhalari' : 'Slice of Life';
+  String get historicalCategory =>
+      locale.languageCode == 'uz' ? 'Tarixiy' : 'Historical';
+  String get psychologicalCategory =>
+      locale.languageCode == 'uz' ? 'Psixologik' : 'Psychological';
+  String get shounenCategory =>
+      locale.languageCode == 'uz' ? 'Shounen' : 'Shounen';
 
   // Profile
   String get editProfile =>
@@ -90,6 +130,16 @@ class AppLocalizations {
   String get pleaseEnterValidEmail => locale.languageCode == 'uz'
       ? 'Iltimos, to\'g\'ri email kiriting'
       : 'Please enter a valid email';
+  String get defaultUserName =>
+      locale.languageCode == 'uz' ? 'Anime Sevuvchi' : 'Anime Lover';
+  String get defaultUserEmail =>
+      locale.languageCode == 'uz' ? 'user@example.com' : 'user@example.com';
+  String get defaultUserBio => locale.languageCode == 'uz'
+      ? 'Anime muhabbati bilan...'
+      : 'With love for anime...';
+  String get bioRequired =>
+      locale.languageCode == 'uz' ? 'Bio kiritish majburiy' : 'Bio is required';
+  String get errorMessage => locale.languageCode == 'uz' ? 'Xatolik' : 'Error';
 
   // Language Dialog
   String get chooseLanguage =>
@@ -115,6 +165,22 @@ class AppLocalizations {
   String get startExploring => locale.languageCode == 'uz'
       ? 'Kashf qilishni boshlang va sevimli anime\'laringizni qo\'shing'
       : 'Start exploring and add your favorite animes';
+  String get noFavoriteAnimesYet => locale.languageCode == 'uz'
+      ? 'Sevimli anime\'laringiz yo\'q'
+      : 'No favorite animes yet';
+  String get tapHeartToFavorite => locale.languageCode == 'uz'
+      ? 'Anime\'larni sevimli qilish uchun ❤️ tugmasini bosing'
+      : 'Tap ❤️ button to favorite animes';
+  String get viewAnimes =>
+      locale.languageCode == 'uz' ? 'Anime\'larni ko\'rish' : 'View Animes';
+  String get deleteAllFavorites => locale.languageCode == 'uz'
+      ? 'Barcha sevimlilarni o\'chirish'
+      : 'Delete All Favorites';
+  String get confirmDeleteAllFavorites => locale.languageCode == 'uz'
+      ? 'Haqiqatan ham barcha sevimli anime\'larni o\'chirmoqchimisiz?'
+      : 'Are you sure you want to delete all favorite animes?';
+  String get delete => locale.languageCode == 'uz' ? 'O\'chirish' : 'Delete';
+  String get count => locale.languageCode == 'uz' ? 'ta' : '';
 
   // Messages
   String get addedToMyList => locale.languageCode == 'uz'
@@ -142,6 +208,34 @@ class AppLocalizations {
       locale.languageCode == 'uz' ? 'Yuklanmoqda...' : 'Loading...';
   String get retry => locale.languageCode == 'uz' ? 'Qayta urinish' : 'Retry';
   String get unknown => locale.languageCode == 'uz' ? 'Noma\'lum' : 'Unknown';
+  String get loadingAmazingAnime => locale.languageCode == 'uz'
+      ? 'Ajoyib anime\'lar yuklanmoqda...'
+      : 'Loading amazing anime...';
+  String get noAnimeFoundGeneral =>
+      locale.languageCode == 'uz' ? 'Anime topilmadi' : 'No anime found';
+  String get forYou => locale.languageCode == 'uz' ? 'Siz uchun' : 'For You';
+  String get anime => locale.languageCode == 'uz' ? 'Anime' : 'Anime';
+  String get removedFromFavoritesMessage => locale.languageCode == 'uz'
+      ? 'Sevimlilardan olib tashlandi'
+      : 'Removed from favorites';
+  String get averageConsumption => locale.languageCode == 'uz'
+      ? 'O\'rtacha iste\'mol'
+      : 'Average consumption';
+  String get hoursPerMonth =>
+      locale.languageCode == 'uz' ? 'soat / oyiga' : 'Hours / month';
+  String get activeSubscription =>
+      locale.languageCode == 'uz' ? 'faol obuna' : 'active subscription';
+  String get freeDownload =>
+      locale.languageCode == 'uz' ? 'Bepul yuklab olish' : 'Free Download';
+  String get mangaDescription => locale.languageCode == 'uz'
+      ? '1 milliondan ortiq Manga\nbarmoq uchida'
+      : 'More than 1 million Manga\non your Finger tip';
+  String get chooseLanguageTitle => locale.languageCode == 'uz'
+      ? 'Tilni tanlang / Choose Language'
+      : 'Choose Language / Tilni tanlang';
+  String get cancelButton => locale.languageCode == 'uz'
+      ? 'Bekor qilish / Cancel'
+      : 'Cancel / Bekor qilish';
 }
 
 class _AppLocalizationsDelegate

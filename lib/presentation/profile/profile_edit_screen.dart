@@ -32,28 +32,41 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    // initState'da localization mavjud emas, shuning uchun didChangeDependencies'da yuklaymiz
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isDataLoaded) {
+      _loadUserData();
+      _isDataLoaded = true;
+    }
+  }
+
+  bool _isDataLoaded = false;
+
   void _loadUserData() {
+    final localizations = AppLocalizations.of(context)!;
+
     _nameController.text =
         HiveService.getSetting<String>(
           'user_name',
-          defaultValue: 'Anime Sevuvchi',
+          defaultValue: localizations.defaultUserName,
         ) ??
-        'Anime Sevuvchi';
+        localizations.defaultUserName;
     _emailController.text =
         HiveService.getSetting<String>(
           'user_email',
-          defaultValue: 'user@example.com',
+          defaultValue: localizations.defaultUserEmail,
         ) ??
-        'user@example.com';
+        localizations.defaultUserEmail;
     _bioController.text =
         HiveService.getSetting<String>(
           'user_bio',
-          defaultValue: 'Anime muhabbati bilan...',
+          defaultValue: localizations.defaultUserBio,
         ) ??
-        'Anime muhabbati bilan...';
+        localizations.defaultUserBio;
     _selectedAvatar =
         HiveService.getSetting<String>(
           'user_avatar',
@@ -231,7 +244,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               maxLines: 3,
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return 'Bio kiritish majburiy';
+                  return localizations.bioRequired;
                 }
                 return null;
               },
@@ -257,9 +270,9 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                           strokeWidth: 2,
                         ),
                       )
-                    : const Text(
-                        'Saqlash',
-                        style: TextStyle(
+                    : Text(
+                        localizations.save,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -314,6 +327,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
       return;
     }
 
+    final localizations = AppLocalizations.of(context)!;
     setState(() => _isLoading = true);
 
     try {
@@ -326,7 +340,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context)!.profileSaved),
+            content: Text(localizations.profileSaved),
             backgroundColor: Colors.green,
           ),
         );
@@ -335,7 +349,10 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Xatolik: $e'), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text('${localizations.errorMessage}: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } finally {
