@@ -1,10 +1,12 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:animehome/presentation/theme/theme_provider.dart';
 import 'package:animehome/presentation/profile/profile_edit_screen.dart';
 import 'package:animehome/presentation/settings/settings_provider.dart';
+import 'package:animehome/presentation/auth/auth_provider.dart';
+import 'package:animehome/presentation/auth/welcome_screen.dart';
 import 'package:animehome/l10n/app_localizations.dart';
-import 'package:animehome/data/services/hive_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -14,36 +16,55 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  String _userName = '';
-  String _userEmail = '';
-  String _userBio = '';
-  String _userAvatar = '';
+  Future<void> _logout() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-  @override
-  void initState() {
-    super.initState();
-    _loadUserData();
-  }
+    // Logout dialog ko'rsatish
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF2A2A2A),
+        title: const Text(
+          'Tizimdan chiqish',
+          style: TextStyle(color: Colors.white),
+        ),
+        content: const Text(
+          'Haqiqatan ham tizimdan chiqmoqchimisiz?',
+          style: TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Bekor qilish'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Chiqish'),
+          ),
+        ],
+      ),
+    );
 
-  void _loadUserData() {
-    setState(() {
-      _userName =
-          HiveService.getSetting<String>('user_name', defaultValue: '') ?? '';
-      _userEmail =
-          HiveService.getSetting<String>('user_email', defaultValue: '') ?? '';
-      _userBio =
-          HiveService.getSetting<String>('user_bio', defaultValue: '') ?? '';
-      _userAvatar =
-          HiveService.getSetting<String>('user_avatar', defaultValue: '') ?? '';
-    });
+    if (shouldLogout == true) {
+      await authProvider.logout();
+
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+          (route) => false,
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
 
-    return Consumer2<ThemeProvider, SettingsProvider>(
-      builder: (context, themeProvider, settingsProvider, child) {
+    return Consumer3<ThemeProvider, SettingsProvider, AuthProvider>(
+      builder: (context, themeProvider, settingsProvider, authProvider, child) {
+        final user = authProvider.currentUser;
         return Scaffold(
           backgroundColor: themeProvider.backgroundColor,
           body: SafeArea(
@@ -118,17 +139,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ],
                             ),
                           ),
-                          child: const Icon(
-                            Icons.person_rounded,
-                            color: Colors.white,
-                            size: 50,
-                          ),
+                          child: user?.profileImagePath != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(50),
+                                  child: Image.file(
+                                    File(user!.profileImagePath!),
+                                    fit: BoxFit.cover,
+                                    width: 100,
+                                    height: 100,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return const Icon(
+                                        Icons.person_rounded,
+                                        color: Colors.white,
+                                        size: 50,
+                                      );
+                                    },
+                                  ),
+                                )
+                              : const Icon(
+                                  Icons.person_rounded,
+                                  color: Colors.white,
+                                  size: 50,
+                                ),
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          _userName.isEmpty
-                              ? localizations.defaultUserName
-                              : _userName,
+                          user?.name ?? localizations.defaultUserName,
                           style: TextStyle(
                             color: themeProvider.primaryTextColor,
                             fontSize: 24,
@@ -137,9 +173,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          _userEmail.isEmpty
-                              ? localizations.defaultUserEmail
-                              : _userEmail,
+                          'Anime sevuvchi',
                           style: TextStyle(
                             color: themeProvider.secondaryTextColor,
                             fontSize: 16,
@@ -284,17 +318,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Icons.person_outline_rounded,
                     localizations.editProfile,
                     () async {
-                      final result = await Navigator.push(
+                      await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => const ProfileEditScreen(),
                         ),
                       );
-
-                      // Agar profil yangilangan bo'lsa, ma'lumotlarni qayta yuklash
-                      if (result == true) {
-                        _loadUserData();
-                      }
                     },
                   ),
 
@@ -329,6 +358,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       },
                       activeColor: themeProvider.primaryColor,
                     ),
+                  ),
+
+                  // Logout tugmasi
+                  _buildMenuItem(
+                    context,
+                    themeProvider,
+                    Icons.logout_rounded,
+                    'Tizimdan chiqish',
+                    _logout,
                   ),
 
                   const SizedBox(height: 40),

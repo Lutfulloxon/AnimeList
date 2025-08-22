@@ -56,6 +56,10 @@ dependencies:
   # --- Theme Storage ---
   shared_preferences: ^2.2.2
 
+  # --- Image Picker ---
+  image_picker: ^1.0.4
+  path_provider: ^2.1.1
+
   # --- Qo'shimcha Flutter yordamchi kutubxonalar ---
   flutter_hooks: ^0.20.5
 

@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:animehome/presentation/main_navigation.dart';
 import 'package:animehome/presentation/likes/likes_provider.dart';
 import 'package:animehome/presentation/settings/settings_provider.dart';
+import 'package:animehome/presentation/auth/auth_provider.dart';
+import 'package:animehome/presentation/auth/welcome_screen.dart';
 import 'package:animehome/l10n/app_localizations.dart';
 
 import 'package:animehome/presentation/home/hybrid_anime_provider.dart';
@@ -19,6 +21,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (context) => AuthProvider()..init()),
         ChangeNotifierProvider(create: (context) => LikesProvider()..init()),
         ChangeNotifierProvider(create: (context) => SettingsProvider()..init()),
         ChangeNotifierProvider(
@@ -41,8 +44,8 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<SettingsProvider>(
-      builder: (context, settingsProvider, child) {
+    return Consumer2<SettingsProvider, AuthProvider>(
+      builder: (context, settingsProvider, authProvider, child) {
         return MaterialApp(
           title: 'Anime Home',
           debugShowCheckedModeBanner: false,
@@ -59,10 +62,29 @@ class _MyAppState extends State<MyApp> {
           themeMode: settingsProvider.isDarkMode
               ? ThemeMode.dark
               : ThemeMode.light,
-          home: const MainNavigation(),
+          home: _getHomeScreen(authProvider),
         );
       },
     );
+  }
+
+  Widget _getHomeScreen(AuthProvider authProvider) {
+    // Auth provider hali yuklanayotgan bo'lsa
+    if (authProvider.isLoading) {
+      return const Scaffold(
+        backgroundColor: Color(0xFF1A1A1A),
+        body: Center(
+          child: CircularProgressIndicator(color: Color(0xFF00D4AA)),
+        ),
+      );
+    }
+
+    // Foydalanuvchi tizimga kirganmi?
+    if (authProvider.isLoggedIn) {
+      return const MainNavigation();
+    } else {
+      return const WelcomeScreen();
+    }
   }
 
   ThemeData _buildLightTheme() {

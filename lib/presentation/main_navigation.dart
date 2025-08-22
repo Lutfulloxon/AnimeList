@@ -42,7 +42,10 @@ class _MainNavigationState extends State<MainNavigation> {
     );
   }
 
-  Widget _buildBottomNavigation(ThemeProvider themeProvider, AppLocalizations localizations) {
+  Widget _buildBottomNavigation(
+    ThemeProvider themeProvider,
+    AppLocalizations localizations,
+  ) {
     return Container(
       decoration: BoxDecoration(
         color: themeProvider.cardColor,

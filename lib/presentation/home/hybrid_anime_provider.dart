@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:animehome/domain/entities/anime/anime_list_entity.dart';
 import 'package:animehome/data/services/anime_api_service.dart';
 import 'package:animehome/data/services/smart_cache_service.dart';
+
 class HybridAnimeProvider extends ChangeNotifier {
   List<AnimeEntity> _animeList = [];
   List<AnimeEntity> _searchResults = [];
@@ -29,26 +30,43 @@ class HybridAnimeProvider extends ChangeNotifier {
   /// Internet tekshirish va ma'lumot yuklash
   Future<void> _checkInternetAndLoadData() async {
     _isLoading = true;
+    _error = null;
     notifyListeners();
 
     try {
+      print('🚀 Starting data load process...');
+
       // Internet tekshirish
       _isOnline = await SmartCacheService.hasInternetConnection();
+      print('🌐 Internet status: ${_isOnline ? "Connected" : "Offline"}');
 
       if (_isOnline) {
         // Online: API'dan yuklash
+        print('📡 Loading from API...');
         await _loadFromAPI();
       } else {
         // Offline: Cache'dan yuklash
+        print('💾 Loading from cache...');
         await _loadFromCache();
       }
+
+      print('✅ Data load completed. Total anime: ${_animeList.length}');
     } catch (e) {
+      print('❌ Error in data loading: $e');
       _error = e.toString();
+
       // Xatolik bo'lsa cache'dan yuklashga harakat qilish
-      await _loadFromCache();
+      try {
+        print('🔄 Trying to load from cache as fallback...');
+        await _loadFromCache();
+      } catch (cacheError) {
+        print('❌ Cache fallback also failed: $cacheError');
+        _error = 'Internet yo\'q va cache ham mavjud emas: $e';
+      }
     } finally {
       _isLoading = false;
       notifyListeners();
+      print('🏁 Data loading process finished');
     }
   }
 
