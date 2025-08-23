@@ -8,6 +8,7 @@ import 'package:animehome/presentation/detail/anime_detail_page.dart';
 import 'package:animehome/presentation/theme/theme_provider.dart';
 import 'package:animehome/presentation/likes/likes_provider.dart';
 import 'package:animehome/l10n/app_localizations.dart';
+import 'package:animehome/domain/entities/anime/anime_list_entity.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -248,6 +249,68 @@ class HomeScreen extends StatelessWidget {
                           provider.animeList.take(6).toList(),
                         ),
                       ),
+
+                      // Current Season Section
+                      if (provider.currentSeasonAnime.isNotEmpty)
+                        SliverToBoxAdapter(
+                          child: _buildSectionHeader(
+                            '🌸 Joriy Mavsum',
+                            'Barchasini ko\'rish',
+                            () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AllAnimePage(
+                                    animeList: provider.currentSeasonAnime,
+                                    title: 'Joriy Mavsum Anime\'lari',
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      if (provider.currentSeasonAnime.isNotEmpty)
+                        SliverToBoxAdapter(
+                          child: _buildHorizontalAnimeList(
+                            provider.currentSeasonAnime.take(6).toList(),
+                          ),
+                        ),
+
+                      // Upcoming Section
+                      if (provider.upcomingAnime.isNotEmpty)
+                        SliverToBoxAdapter(
+                          child: _buildSectionHeader(
+                            '🔮 Kelayotgan Anime\'lar',
+                            'Barchasini ko\'rish',
+                            () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AllAnimePage(
+                                    animeList: provider.upcomingAnime,
+                                    title: 'Kelayotgan Anime\'lar',
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      if (provider.upcomingAnime.isNotEmpty)
+                        SliverToBoxAdapter(
+                          child: _buildHorizontalAnimeList(
+                            provider.upcomingAnime.take(6).toList(),
+                          ),
+                        ),
+
+                      // Random Anime Section
+                      if (provider.randomAnime != null)
+                        SliverToBoxAdapter(
+                          child: _buildRandomAnimeSection(
+                            context,
+                            provider.randomAnime!,
+                            localizations,
+                          ),
+                        ),
 
                       // For You Section
                       SliverToBoxAdapter(
@@ -678,6 +741,308 @@ class HomeScreen extends StatelessWidget {
             ),
           );
         },
+      ),
+    );
+  }
+
+  /// Horizontal anime list widget
+  Widget _buildHorizontalAnimeList(List<AnimeEntity> animeList) {
+    return Container(
+      height: 280,
+      margin: const EdgeInsets.only(bottom: 20),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        itemCount: animeList.length,
+        itemBuilder: (context, index) {
+          final anime = animeList[index];
+          return Container(
+            width: 160,
+            margin: const EdgeInsets.only(right: 16),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AnimeDetailPage(anime: anime),
+                  ),
+                );
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Anime Image
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: CachedNetworkImage(
+                          imageUrl: anime.imageUrl,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          placeholder: (context, url) => Container(
+                            color: const Color(0xFF1A1A2E),
+                            child: const Center(
+                              child: CircularProgressIndicator(
+                                color: Color(0xFF00D4AA),
+                                strokeWidth: 2,
+                              ),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            color: const Color(0xFF1A1A2E),
+                            child: const Center(
+                              child: Icon(
+                                Icons.movie_rounded,
+                                color: Color(0xFF00D4AA),
+                                size: 32,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  // Anime Title
+                  Text(
+                    anime.title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+
+                  const SizedBox(height: 4),
+
+                  // Rating and Year
+                  Row(
+                    children: [
+                      Icon(Icons.star_rounded, color: Colors.amber, size: 16),
+                      const SizedBox(width: 4),
+                      Text(
+                        anime.rating.toStringAsFixed(1),
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                        ),
+                      ),
+                      const Spacer(),
+                      Text(
+                        anime.year.toString(),
+                        style: const TextStyle(
+                          color: Colors.white54,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  /// Random anime section widget
+  Widget _buildRandomAnimeSection(
+    BuildContext context,
+    AnimeEntity anime,
+    AppLocalizations localizations,
+  ) {
+    return Container(
+      margin: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFF00D4AA).withValues(alpha: 0.1),
+            const Color(0xFF1A1A2E).withValues(alpha: 0.8),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: const Color(0xFF00D4AA).withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.casino_rounded,
+                color: Color(0xFF00D4AA),
+                size: 24,
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                '🎲 Tasodifiy Anime',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const Spacer(),
+              TextButton(
+                onPressed: () {
+                  final provider = Provider.of<HybridAnimeProvider>(
+                    context,
+                    listen: false,
+                  );
+                  provider.loadRandomAnime();
+                },
+                child: const Text(
+                  'Yangi',
+                  style: TextStyle(
+                    color: Color(0xFF00D4AA),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AnimeDetailPage(anime: anime),
+                ),
+              );
+            },
+            child: Row(
+              children: [
+                // Anime Image
+                Container(
+                  width: 80,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: CachedNetworkImage(
+                      imageUrl: anime.imageUrl,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Container(
+                        color: const Color(0xFF1A1A2E),
+                        child: const Center(
+                          child: CircularProgressIndicator(
+                            color: Color(0xFF00D4AA),
+                            strokeWidth: 2,
+                          ),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        color: const Color(0xFF1A1A2E),
+                        child: const Center(
+                          child: Icon(
+                            Icons.movie_rounded,
+                            color: Color(0xFF00D4AA),
+                            size: 24,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(width: 16),
+
+                // Anime Info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        anime.title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.star_rounded,
+                            color: Colors.amber,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            anime.rating.toStringAsFixed(1),
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Text(
+                            anime.year.toString(),
+                            style: const TextStyle(
+                              color: Colors.white54,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      Text(
+                        anime.description,
+                        style: const TextStyle(
+                          color: Colors.white60,
+                          fontSize: 12,
+                        ),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -6,6 +6,9 @@ import 'package:animehome/data/services/smart_cache_service.dart';
 class HybridAnimeProvider extends ChangeNotifier {
   List<AnimeEntity> _animeList = [];
   List<AnimeEntity> _searchResults = [];
+  List<AnimeEntity> _currentSeasonAnime = [];
+  List<AnimeEntity> _upcomingAnime = [];
+  AnimeEntity? _randomAnime;
   bool _isLoading = false;
   bool _isSearching = false;
   String? _error;
@@ -16,6 +19,9 @@ class HybridAnimeProvider extends ChangeNotifier {
   // Getters
   List<AnimeEntity> get animeList => _animeList;
   List<AnimeEntity> get searchResults => _searchResults;
+  List<AnimeEntity> get currentSeasonAnime => _currentSeasonAnime;
+  List<AnimeEntity> get upcomingAnime => _upcomingAnime;
+  AnimeEntity? get randomAnime => _randomAnime;
   bool get isLoading => _isLoading;
   bool get isSearching => _isSearching;
   String? get error => _error;
@@ -25,6 +31,8 @@ class HybridAnimeProvider extends ChangeNotifier {
   /// Provider'ni initialize qilish
   Future<void> init() async {
     await _checkInternetAndLoadData();
+    // Kategoriyalarni ham yuklash
+    await loadAllCategories();
   }
 
   /// Internet tekshirish va ma'lumot yuklash
@@ -296,5 +304,56 @@ class HybridAnimeProvider extends ChangeNotifier {
   Future<void> clearCache() async {
     await SmartCacheService.clearCache();
     await refresh();
+  }
+
+  /// Joriy mavsum anime'larini yuklash
+  Future<void> loadCurrentSeasonAnime() async {
+    try {
+      print('🌸 Loading current season anime...');
+      _currentSeasonAnime = await AnimeApiService.getCurrentSeasonAnime(
+        limit: 20,
+      );
+      print('🌸 Loaded ${_currentSeasonAnime.length} current season anime');
+      notifyListeners();
+    } catch (e) {
+      print('❌ Current season error: $e');
+    }
+  }
+
+  /// Kelayotgan anime'larni yuklash
+  Future<void> loadUpcomingAnime() async {
+    try {
+      print('🔮 Loading upcoming anime...');
+      _upcomingAnime = await AnimeApiService.getUpcomingAnime(limit: 20);
+      print('🔮 Loaded ${_upcomingAnime.length} upcoming anime');
+      notifyListeners();
+    } catch (e) {
+      print('❌ Upcoming error: $e');
+    }
+  }
+
+  /// Random anime yuklash
+  Future<void> loadRandomAnime() async {
+    try {
+      print('🎲 Loading random anime...');
+      _randomAnime = await AnimeApiService.getRandomAnime();
+      if (_randomAnime != null) {
+        print('🎲 Loaded random anime: ${_randomAnime!.title}');
+      }
+      notifyListeners();
+    } catch (e) {
+      print('❌ Random anime error: $e');
+    }
+  }
+
+  /// Barcha kategoriyalarni yuklash
+  Future<void> loadAllCategories() async {
+    if (_isOnline) {
+      await Future.wait([
+        loadCurrentSeasonAnime(),
+        loadUpcomingAnime(),
+        loadRandomAnime(),
+      ]);
+    }
   }
 }

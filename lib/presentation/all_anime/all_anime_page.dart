@@ -6,8 +6,9 @@ import 'package:animehome/presentation/theme/theme_provider.dart';
 
 class AllAnimePage extends StatefulWidget {
   final List<dynamic> animeList;
+  final String? title;
 
-  const AllAnimePage({super.key, required this.animeList});
+  const AllAnimePage({super.key, required this.animeList, this.title});
 
   @override
   State<AllAnimePage> createState() => _AllAnimePageState();
@@ -48,7 +49,7 @@ class _AllAnimePageState extends State<AllAnimePage> {
                         ),
                         Expanded(
                           child: Text(
-                            'All Anime',
+                            widget.title ?? 'All Anime',
                             style: TextStyle(
                               color: themeProvider.primaryTextColor,
                               fontSize: 24,

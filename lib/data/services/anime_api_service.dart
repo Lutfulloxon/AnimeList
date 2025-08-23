@@ -4,7 +4,7 @@ import 'package:animehome/data/models/real_anime_model.dart';
 import 'package:animehome/domain/entities/anime/anime_list_entity.dart';
 
 class AnimeApiService {
-  static const String _baseUrl = 'https://api.jikan.moe/v4';
+  static const String _baseUrl = 'https://api.jikan.moe/v4/anime';
   static const Duration _timeout = Duration(seconds: 10);
 
   /// Top anime'larni olish
@@ -200,6 +200,195 @@ class AnimeApiService {
       }
     } catch (e) {
       throw Exception('Genre error: $e');
+    }
+  }
+
+  /// Hozir efirda bo'lgan anime'lar
+  static Future<List<AnimeEntity>> getCurrentSeasonAnime({
+    int page = 1,
+    int limit = 25,
+  }) async {
+    try {
+      final url = '$_baseUrl/seasons/now?page=$page&limit=$limit';
+      print('🌸 Current Season Request: $url');
+
+      final response = await http
+          .get(
+            Uri.parse(url),
+            headers: {
+              'Content-Type': 'application/json',
+              'User-Agent': 'AnimeHome/1.0',
+            },
+          )
+          .timeout(_timeout);
+
+      print('📡 Season Response: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+
+        if (jsonData['data'] != null) {
+          final List<dynamic> animeList = jsonData['data'];
+          print('🌸 Found ${animeList.length} current season anime');
+
+          return animeList.map((animeJson) {
+            return AnimeEntity(
+              id: animeJson['mal_id'] ?? 0,
+              title: animeJson['title'] ?? 'Unknown',
+              japaneseTitle:
+                  animeJson['title_japanese'] ??
+                  animeJson['title'] ??
+                  'Unknown',
+              year:
+                  animeJson['year'] ??
+                  animeJson['aired']?['prop']?['from']?['year'] ??
+                  2024,
+              episodes: animeJson['episodes'] ?? 0,
+              genres:
+                  (animeJson['genres'] as List<dynamic>?)
+                      ?.map((g) => g['name'].toString())
+                      .toList() ??
+                  [],
+              rating: (animeJson['score'] as num?)?.toDouble() ?? 0.0,
+              imageUrl: animeJson['images']?['jpg']?['image_url'] ?? '',
+              description: animeJson['synopsis'] ?? 'Tavsif mavjud emas',
+            );
+          }).toList();
+        } else {
+          return [];
+        }
+      } else {
+        print('❌ Season API Error: ${response.statusCode}');
+        throw Exception(
+          'Joriy mavsum anime\'lari xatoligi: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      print('❌ Season error: $e');
+      throw Exception('Joriy mavsum xatoligi: $e');
+    }
+  }
+
+  /// Kelayotgan anime'lar
+  static Future<List<AnimeEntity>> getUpcomingAnime({
+    int page = 1,
+    int limit = 25,
+  }) async {
+    try {
+      final url = '$_baseUrl/seasons/upcoming?page=$page&limit=$limit';
+      print('🔮 Upcoming Request: $url');
+
+      final response = await http
+          .get(
+            Uri.parse(url),
+            headers: {
+              'Content-Type': 'application/json',
+              'User-Agent': 'AnimeHome/1.0',
+            },
+          )
+          .timeout(_timeout);
+
+      print('📡 Upcoming Response: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+
+        if (jsonData['data'] != null) {
+          final List<dynamic> animeList = jsonData['data'];
+          print('🔮 Found ${animeList.length} upcoming anime');
+
+          return animeList.map((animeJson) {
+            return AnimeEntity(
+              id: animeJson['mal_id'] ?? 0,
+              title: animeJson['title'] ?? 'Unknown',
+              japaneseTitle:
+                  animeJson['title_japanese'] ??
+                  animeJson['title'] ??
+                  'Unknown',
+              year:
+                  animeJson['year'] ??
+                  animeJson['aired']?['prop']?['from']?['year'] ??
+                  2024,
+              episodes: animeJson['episodes'] ?? 0,
+              genres:
+                  (animeJson['genres'] as List<dynamic>?)
+                      ?.map((g) => g['name'].toString())
+                      .toList() ??
+                  [],
+              rating: (animeJson['score'] as num?)?.toDouble() ?? 0.0,
+              imageUrl: animeJson['images']?['jpg']?['image_url'] ?? '',
+              description: animeJson['synopsis'] ?? 'Tavsif mavjud emas',
+            );
+          }).toList();
+        } else {
+          return [];
+        }
+      } else {
+        print('❌ Upcoming API Error: ${response.statusCode}');
+        throw Exception(
+          'Kelayotgan anime\'lar xatoligi: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      print('❌ Upcoming error: $e');
+      throw Exception('Kelayotgan anime\'lar xatoligi: $e');
+    }
+  }
+
+  /// Random anime olish
+  static Future<AnimeEntity?> getRandomAnime() async {
+    try {
+      final url = '$_baseUrl/random/anime';
+      print('🎲 Random Request: $url');
+
+      final response = await http
+          .get(
+            Uri.parse(url),
+            headers: {
+              'Content-Type': 'application/json',
+              'User-Agent': 'AnimeHome/1.0',
+            },
+          )
+          .timeout(_timeout);
+
+      print('📡 Random Response: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+
+        if (jsonData['data'] != null) {
+          final animeJson = jsonData['data'];
+          print('🎲 Random anime: ${animeJson['title']}');
+
+          return AnimeEntity(
+            id: animeJson['mal_id'] ?? 0,
+            title: animeJson['title'] ?? 'Unknown',
+            japaneseTitle:
+                animeJson['title_japanese'] ?? animeJson['title'] ?? 'Unknown',
+            year:
+                animeJson['year'] ??
+                animeJson['aired']?['prop']?['from']?['year'] ??
+                2024,
+            episodes: animeJson['episodes'] ?? 0,
+            genres:
+                (animeJson['genres'] as List<dynamic>?)
+                    ?.map((g) => g['name'].toString())
+                    .toList() ??
+                [],
+            rating: (animeJson['score'] as num?)?.toDouble() ?? 0.0,
+            imageUrl: animeJson['images']?['jpg']?['image_url'] ?? '',
+            description: animeJson['synopsis'] ?? 'Tavsif mavjud emas',
+          );
+        } else {
+          return null;
+        }
+      } else {
+        print('❌ Random API Error: ${response.statusCode}');
+        throw Exception('Random anime xatoligi: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('❌ Random error: $e');
+      throw Exception('Random anime xatoligi: $e');
     }
   }
 }
