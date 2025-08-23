@@ -4,7 +4,7 @@ import 'package:animehome/data/models/real_anime_model.dart';
 import 'package:animehome/domain/entities/anime/anime_list_entity.dart';
 
 class AnimeApiService {
-  static const String _baseUrl = 'https://api.jikan.moe/v4/anime';
+  static const String _baseUrl = 'https://api.jikan.moe/v4';
   static const Duration _timeout = Duration(seconds: 10);
 
   /// Top anime'larni olish
